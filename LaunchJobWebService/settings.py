@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "room.apps.RoomConfig",
     'rest_framework',
     'django_seed',
+    "event.apps.EventConfig"
 ]
 
 MIDDLEWARE = [
