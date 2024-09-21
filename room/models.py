@@ -6,6 +6,7 @@ from django.db import models
 def get_upload_path(instance, filename):
     return os.path.join('images', filename)
 
+
 class Room(models.Model):
     name = models.CharField(max_length=100)
     location = models.CharField(max_length=100)
