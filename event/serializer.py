@@ -61,6 +61,10 @@ class EventAttendeeSerializer(serializers.Serializer):
         event = validated_data.get('event')
         name = validated_data.get('name')
         email = validated_data.get('email')
+
+        if event.capacity <= 0:
+            raise serializers.ValidationError("The event has reached its capacity.")
+
         attendee, created = Attendee.objects.get_or_create(
             email=email,
             defaults={'name': name}
@@ -69,4 +73,9 @@ class EventAttendeeSerializer(serializers.Serializer):
         if EventAttendee.objects.filter(event=event, attendee=attendee).exists():
             raise serializers.ValidationError("This attendee is already registered for this event.")
 
-        return EventAttendee.objects.create(event=event, attendee=attendee)
+        event_attendee = EventAttendee.objects.create(event=event, attendee=attendee)
+
+        event.capacity -= 1
+        event.save()
+
+        return event_attendee
