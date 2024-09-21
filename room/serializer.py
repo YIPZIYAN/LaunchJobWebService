@@ -14,7 +14,20 @@ class RoomGallerySerializer(serializers.ModelSerializer):
         fields = ['id', 'image', 'room']
 
     def create(self, validated_data):
-        return RoomGallery.objects.create(**validated_data)
+        request = self.context.get('request')
+        images = request.FILES.getlist('image')
+        room = validated_data.get('room')
+
+        room_gallery_objects = []
+        for image in images:
+            room_gallery_objects.append(RoomGallery(room=room, image=image))
+
+        RoomGallery.objects.bulk_create(room_gallery_objects)
+
+        # Return a queryset of the newly created objects to the view
+        return RoomGallery.objects.filter(room=room)
+
+
 
 
 class RoomSerializer(serializers.Serializer):
@@ -27,7 +40,7 @@ class RoomSerializer(serializers.Serializer):
     price = serializers.IntegerField(required=True)
     type = serializers.CharField(required=True,max_length=100)
     description = serializers.CharField(required=True)
-    thumbnail = serializers.ImageField(required=True)
+    thumbnail = serializers.ImageField(required=False)
     tags = serializers.CharField(required=True,max_length=100)
     galleries = RoomGallerySerializer(many=True, read_only=True)
     created_at = serializers.DateTimeField(read_only=True)

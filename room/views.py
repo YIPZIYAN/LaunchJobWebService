@@ -29,11 +29,18 @@ def room_details(request, room_id):
 
     return Response(RoomSerializer(room).data)
 
+
 @api_view(['POST'])
 def storeGallery(request):
-    serializer = RoomGallerySerializer(data=request.data)
+    serializer = RoomGallerySerializer(data=request.data, context={'request': request})
+
     if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        created_objects = serializer.save()
+
+        # Serialize the created objects
+        serialized_data = RoomGallerySerializer(created_objects, many=True).data
+
+        return Response(serialized_data, status=status.HTTP_201_CREATED)
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
