@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from event.models import Event
+from event.models import Event, Attendee, EventAttendee
 
 
 class EventSerializer(serializers.Serializer):
@@ -13,12 +13,10 @@ class EventSerializer(serializers.Serializer):
     capacity = serializers.IntegerField(required=True)
     time = serializers.TimeField(required=True)
     image = serializers.ImageField(required=True)
-    created_date = serializers.DateField(required=True)
 
     class Meta:
         model = Event
-        fields = ('id', 'name', 'description', 'location', 'start_date', 'end_date', 'capacity', 'time', 'image',
-                  'created_date')
+        fields = ('id', 'name', 'description', 'location', 'start_date', 'end_date', 'capacity', 'time', 'image')
 
     def create(self, validated_data):
         return Event.objects.create(**validated_data)
@@ -32,6 +30,31 @@ class EventSerializer(serializers.Serializer):
         instance.capacity = validated_data.get('capacity', instance.capacity)
         instance.time = validated_data.get('time', instance.time)
         instance.image = validated_data.get('image', instance.image)
-        instance.created_date = validated_data.get('created_date', instance.created_date)
         instance.save()
         return instance
+
+
+class AttendeeSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(required=True, max_length=100)
+    email = serializers.EmailField(required=True, max_length=100)
+
+    class Meta:
+        model = Attendee
+        fields = ('id', 'name', 'email')
+
+    def create(self, validated_data):
+        return Attendee.objects.create(**validated_data)
+
+
+class EventAttendeeSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    event_id = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all(), source='event')
+    attendee_id = serializers.PrimaryKeyRelatedField(queryset=Attendee.objects.all(), source='attendee')
+
+    class Meta:
+        model = EventAttendee
+        fields = ('id', 'event_id', 'attendee_id')
+
+    def create(self, validated_data):
+        return EventAttendee.objects.create(**validated_data)
