@@ -50,11 +50,23 @@ class AttendeeSerializer(serializers.Serializer):
 class EventAttendeeSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     event_id = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all(), source='event')
-    attendee_id = serializers.PrimaryKeyRelatedField(queryset=Attendee.objects.all(), source='attendee')
+    email = serializers.EmailField(required=True, write_only=True)
+    name = serializers.CharField(required=True, max_length=100, write_only=True)
 
     class Meta:
         model = EventAttendee
-        fields = ('id', 'event_id', 'attendee_id')
+        fields = ('id', 'event_id', 'email', 'name')
 
     def create(self, validated_data):
-        return EventAttendee.objects.create(**validated_data)
+        event = validated_data.get('event')
+        name = validated_data.get('name')
+        email = validated_data.get('email')
+        attendee, created = Attendee.objects.get_or_create(
+            email=email,
+            defaults={'name': name}
+        )
+
+        if EventAttendee.objects.filter(event=event, attendee=attendee).exists():
+            raise serializers.ValidationError("This attendee is already registered for this event.")
+
+        return EventAttendee.objects.create(event=event, attendee=attendee)
