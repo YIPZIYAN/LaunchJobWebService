@@ -52,6 +52,8 @@ class EventAttendeeSerializer(serializers.Serializer):
     event_id = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all(), source='event')
     email = serializers.EmailField(required=True, write_only=True)
     name = serializers.CharField(required=True, max_length=100, write_only=True)
+    event = EventSerializer(read_only=True)
+    attendee = AttendeeSerializer(read_only=True)
 
     class Meta:
         model = EventAttendee
@@ -71,7 +73,7 @@ class EventAttendeeSerializer(serializers.Serializer):
         )
 
         if EventAttendee.objects.filter(event=event, attendee=attendee).exists():
-            raise serializers.ValidationError("This attendee is already registered for this event.")
+            raise serializers.ValidationError("You have already applied this event.")
 
         event_attendee = EventAttendee.objects.create(event=event, attendee=attendee)
 
