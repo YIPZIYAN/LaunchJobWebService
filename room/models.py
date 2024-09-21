@@ -22,8 +22,8 @@ class Room(models.Model):
 
 
 
-# class RoomImage(models.Model):
-#     room = models.ForeignKey(Room, on_delete=models.CASCADE)
-#     image = models.ImageField(upload_to='images/')
-#     class Meta:
-#         db_table = 'room_images'
+class RoomGallery(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to=get_upload_path)
+    class Meta:
+        db_table = 'room_galleries'
