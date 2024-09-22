@@ -12,6 +12,23 @@ def index(request):
     return Response(SkillTestSerializer(SkillTest.objects.all(), many=True).data)
 
 
+@api_view(['GET'])
+def get_skill_test_by_id(request):
+    skill_test_id = request.query_params.get('id')
+
+    if not skill_test_id:
+        return Response({"error": "Skill test ID is required."}, status=400)
+
+    try:
+        skill_test = SkillTest.objects.get(id=skill_test_id)
+    except SkillTest.DoesNotExist:
+        return Response({"error": "Skill test not found."}, status=404)
+
+    # Serialize the skill test object
+    serializer = SkillTestSerializer(skill_test)
+    return Response(serializer.data)
+
+
 @api_view(['POST'])
 def store(request):
     serializer = SkillTestSerializer(data=request.data)
