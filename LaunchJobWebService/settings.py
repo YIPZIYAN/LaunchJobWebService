@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     "room.apps.RoomConfig",
     'rest_framework',
     'django_seed',
-    "event.apps.EventConfig"
+    "event.apps.EventConfig",
+    "skilltest.apps.SkilltestConfig"
 ]
 
 MIDDLEWARE = [
@@ -83,7 +84,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'launchjobplus',
         'USER': 'postgres',
-        'PASSWORD': 'catto',
+        'PASSWORD': 'password',
         'HOST': 'localhost',
         'PORT': 5432,
     }
