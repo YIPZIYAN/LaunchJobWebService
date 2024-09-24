@@ -1,4 +1,7 @@
-from django.shortcuts import render
+from datetime import datetime
+
+from django.conf import settings
+import pytz
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -9,7 +12,10 @@ from event.serializer import EventSerializer, AttendeeSerializer, EventAttendeeS
 
 @api_view(['GET'])
 def index(request):
-    return Response(EventSerializer(Event.objects.all(), many=True).data)
+    local_tz = pytz.timezone(settings.TIME_ZONE)
+    today = datetime.now(local_tz).date()
+    events = Event.objects.filter(start_date__gte=today)
+    return Response(EventSerializer(events, many=True).data)
 
 
 @api_view(['POST'])
